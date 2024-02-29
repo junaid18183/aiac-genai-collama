@@ -8,7 +8,8 @@ import (
 	"net/http"
 	"os"
 
-	"github.com/gofireflyio/aiac/v3/libaiac"
+	"github.com/gofireflyio/aiac/v4/libaiac"
+	"github.com/gofireflyio/aiac/v4/libaiac/ollama"
 	"github.com/gorilla/handlers"
 	"github.com/gorilla/mux"
 )
@@ -44,19 +45,23 @@ func generateIAC(w http.ResponseWriter, r *http.Request) {
 	question := "generate " + requestData.Prompt
 	log.Println(question)
 
-	apiKey := os.Getenv("OPENAI_API_KEY")
+	// apiKey := os.Getenv("OPENAI_API_KEY")
+	OllamaURL := os.Getenv("OllamaURL")
 	options := &libaiac.NewClientOptions{
-		ApiKey: apiKey,
+		// ApiKey: apiKey,
+		OllamaURL: OllamaURL,
+		Backend:   libaiac.BackendOllama,
 	}
 
 	client := libaiac.NewClient(options)
-
 	ctx := context.TODO()
 
 	// Call the library to generate IAC code
 	iacCode, err := client.GenerateCode(
 		ctx,
-		libaiac.ModelGPT35Turbo0301,
+		ollama.ModelCodeLlama,
+		// libaiac.ollama.ModelCodeGPT3,
+		// libaiac.ollama.ModelCodeLlama,
 		string(question),
 	)
 	if err != nil {
