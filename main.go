@@ -46,10 +46,10 @@ func generateIAC(w http.ResponseWriter, r *http.Request) {
 	log.Println(question)
 
 	// apiKey := os.Getenv("OPENAI_API_KEY")
-	OllamaURL := os.Getenv("OllamaURL")
+	OLLAMA_API_BASE_URL := os.Getenv("OLLAMA_API_BASE_URL")
 	options := &libaiac.NewClientOptions{
 		// ApiKey: apiKey,
-		OllamaURL: OllamaURL,
+		OllamaURL: OLLAMA_API_BASE_URL,
 		Backend:   libaiac.BackendOllama,
 	}
 
@@ -60,8 +60,6 @@ func generateIAC(w http.ResponseWriter, r *http.Request) {
 	iacCode, err := client.GenerateCode(
 		ctx,
 		ollama.ModelCodeLlama,
-		// libaiac.ollama.ModelCodeGPT3,
-		// libaiac.ollama.ModelCodeLlama,
 		string(question),
 	)
 	if err != nil {
