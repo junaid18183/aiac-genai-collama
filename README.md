@@ -1,16 +1,13 @@
-# GenAI
------
-## Run locally 
+# How to run 
 
-Build the image
-```
-nerdctl compose build genai
-```
-
-Run it
+## Build contaienr images
 
 ```
-nerdctl run -e OPENAI_API_KEY=$OPENAI_API_KEY --rm  --name genai -p 8086:8086  vivsoft-platform-ui_genai
+make build
 ```
 
-#----
+## Run using Docker compose
+
+```
+make deploy
+```
