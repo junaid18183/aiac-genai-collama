@@ -1,6 +1,7 @@
 package main
 
 import (
+	"bytes"
 	"context"
 	"encoding/json"
 	"io"
@@ -22,6 +23,35 @@ func handleOptions(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS")
 	w.Header().Set("Access-Control-Allow-Headers", "Content-Type, X-Requested-With, Authorization")
 	w.WriteHeader(http.StatusOK)
+}
+
+// Send initial request to OLLAMA_API to keep alive.
+func sendKeepAliveRequest() error {
+	OLLAMA_API_BASE_URL := os.Getenv("OLLAMA_API_BASE_URL")
+	url := OLLAMA_API_BASE_URL + "/generate"
+	payload := map[string]interface{}{
+		"model":      "codellama",
+		"keep_alive": -1,
+	}
+	jsonPayload, err := json.Marshal(payload)
+	if err != nil {
+		return err
+	}
+
+	resp, err := http.Post(url, "application/json", bytes.NewReader(jsonPayload))
+	if err != nil {
+		return err
+	}
+	defer resp.Body.Close()
+
+	// Optionally read the response if needed
+	body, err := io.ReadAll(resp.Body)
+	if err != nil {
+		return err
+	}
+	log.Println("Initial Keep Alive Response: ", string(body))
+
+	return nil
 }
 
 // ------------------------------------------------------------------------
@@ -83,6 +113,12 @@ func generateIAC(w http.ResponseWriter, r *http.Request) {
 
 // ------------------------------------------------------------------------
 func main() {
+	// Send an initial request to OLLAMA_API to keep alive before starting the server.
+	err := sendKeepAliveRequest()
+	if err != nil {
+		log.Fatalf("Failed to send keep alive request: %v", err)
+	}
+
 	port := os.Getenv("PORT")
 	if port == "" {
 		port = ":8086"
