@@ -9,6 +9,8 @@ services:
       - ./ollama_models/:/root/.ollama
     pull_policy: if_not_present
     restart: unless-stopped
+    cpus: 1 # Limit to 50% of a CPU
+    mem_limit: 8000m # Limit to 8GB of RAM
 
   backend:
     depends_on:
