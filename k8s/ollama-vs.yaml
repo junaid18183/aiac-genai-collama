@@ -1,0 +1,19 @@
+apiVersion: networking.istio.io/v1beta1
+kind: VirtualService
+metadata:
+  name: ollama
+  namespace: ollama
+spec:
+  gateways:
+  - istio-system/public-gateway
+  hosts:
+  - ollama.vivplatform.io
+  http:
+  - match:
+    - uri:
+        prefix: /
+    route:
+    - destination:
+        host: ollama-webui
+        port:
+          number: 3001

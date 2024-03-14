@@ -1,0 +1,13 @@
+namespace: ollama
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+resources:
+- namespace.yaml
+- ollama.yaml
+- ollama-ui.yaml
+- ollama-vs.yaml
+
+# images:
+# - name: registry.gitlab.com/enbuild-staging/vivsoft-platform-ui/enbuild-backend
+#   newName: registry.gitlab.com/enbuild-staging/vivsoft-platform-ui/enbuild-backend
+#   newTag: e94d0892efdbb418a664c87e088b95c79427a6c3

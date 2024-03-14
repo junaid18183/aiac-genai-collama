@@ -1,0 +1,71 @@
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    io.kompose.service: ollama-webui
+  name: ollama-webui
+  namespace: ollama
+spec:
+  ports:
+    - name: "3001"
+      port: 3001
+      targetPort: 8080
+  selector:
+    io.kompose.service: ollama-webui
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    io.kompose.service: ollama-webui
+  name: ollama-webui
+  namespace: ollama
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      io.kompose.service: ollama-webui
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        io.kompose.network/aiac-genai-collama-default: "true"
+        io.kompose.service: ollama-webui
+    spec:
+      containers:
+        - env:
+            - name: OLLAMA_API_BASE_URL
+              value: http://ollama:11434/api
+          image: ghcr.io/ollama-webui/ollama-webui:main
+          name: ollama-webui
+          ports:
+            - containerPort: 8080
+              hostPort: 3001
+              protocol: TCP
+          volumeMounts:
+            - mountPath: /app/backend/data
+              name: ollama-webui
+      restartPolicy: Always
+      volumes:
+        - name: ollama-webui
+          persistentVolumeClaim:
+            claimName: ollama-webui
+
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  labels:
+    io.kompose.service: ollama-webui
+  name: ollama-webui
+  namespace: ollama
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 1Gi
+
